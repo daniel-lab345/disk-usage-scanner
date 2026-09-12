@@ -1,0 +1,22 @@
+{
+  "name": "disk-usage-scanner",
+  "version": "0.1.0",
+  "description": "Find what is eating your disk space, with a gitignore-style filter file that gives precise syntax errors",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "disk-usage-scanner": "dist/bin/cli.js"
+  },
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {}
+}
