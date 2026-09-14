@@ -1,5 +1,5 @@
 import { readdirSync, lstatSync } from "node:fs";
-import { join, relative } from "node:path";
+import { join, relative, dirname } from "node:path";
 
 import { isIgnored, type IgnoreRule } from "./ignoreFile.js";
 
@@ -14,13 +14,40 @@ export interface ScanOptions {
 }
 
 // Walks a directory tree and returns every file with its size in bytes.
-// Directories aren't emitted as entries themselves; callers that want
-// per-directory totals can bucket files by their parent path.
+// Directories aren't emitted as entries themselves; use rollupDirectories
+// on the result if you want per-directory totals.
 export function scan(root: string, options: ScanOptions = {}): ScanEntry[] {
   const rules = options.ignoreRules ?? [];
   const entries: ScanEntry[] = [];
   walk(root, root, rules, entries);
   return entries;
+}
+
+export interface DirectoryTotal {
+  readonly path: string;
+  readonly size: number;
+}
+
+// Sums file sizes into every ancestor directory up to (and including) root,
+// so a large file three levels deep counts toward each directory that
+// contains it, not just its immediate parent.
+export function rollupDirectories(entries: readonly ScanEntry[], root: string): DirectoryTotal[] {
+  const totals = new Map<string, number>();
+
+  for (const entry of entries) {
+    let dir = dirname(entry.path);
+    for (;;) {
+      totals.set(dir, (totals.get(dir) ?? 0) + entry.size);
+      if (dir === root) break;
+      const parent = dirname(dir);
+      // dirname("/") === "/", so this guards against looping forever if an
+      // entry's path somehow isn't under root.
+      if (parent === dir) break;
+      dir = parent;
+    }
+  }
+
+  return Array.from(totals, ([path, size]) => ({ path, size }));
 }
 
 function walk(root: string, dir: string, rules: readonly IgnoreRule[], out: ScanEntry[]): void {

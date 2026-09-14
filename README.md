@@ -36,6 +36,21 @@ automatically. You can also point at one explicitly:
 node dist/bin/cli.js . --ignore-file ./config/.duignore
 ```
 
+Pass `--dirs` to roll file sizes up into their containing directories
+instead of listing individual files. A directory's total includes every
+file underneath it, at any depth:
+
+```
+$ node dist/bin/cli.js . --dirs --top 5
+   482.3 MiB  vendor/photos/
+   482.3 MiB  vendor/
+   210.0 MiB  builds/
+    64.7 MiB  logs/
+    12.1 MiB  src/generated/
+
+312 directories, 1.2 GiB total
+```
+
 ### Writing a `.duignore` file
 
 ```
@@ -85,8 +100,18 @@ console.log(largest.path, largest.size);
 the code-frame string shown above, if you want the same diagnostics in your
 own tool.
 
+`rollupDirectories(entries, root)` takes the flat list `scan` returns and
+sums file sizes into every ancestor directory up to `root`:
+
+```ts
+import { scan, rollupDirectories } from "disk-usage-scanner";
+
+const entries = scan("/path/to/project");
+const dirs = rollupDirectories(entries, "/path/to/project");
+```
+
 ## Status
 
-Early skeleton: directory walking and the ignore-file parser work end to
-end, but there's no per-directory rollup yet (only per-file sizes) and no
-test suite. See the project's commit history for what's landed since.
+Early skeleton: directory walking, the ignore-file parser, and
+per-directory rollups work end to end, but there's no test suite yet. See
+the project's commit history for what's landed since.
