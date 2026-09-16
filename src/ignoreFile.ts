@@ -152,7 +152,7 @@ function parseLine(line: string, lineNumber: number, fileName: string): IgnoreRu
 }
 
 function escapeRegExpChar(ch: string): string {
-  return /[.+^${}()|[\]\\]/.test(ch) ? `\\${ch}` : ch;
+  return /[.+*?^${}()|[\]\\]/.test(ch) ? `\\${ch}` : ch;
 }
 
 // Applies gitignore semantics: the last matching rule decides, and a

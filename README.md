@@ -113,5 +113,6 @@ const dirs = rollupDirectories(entries, "/path/to/project");
 ## Status
 
 Early skeleton: directory walking, the ignore-file parser, and
-per-directory rollups work end to end, but there's no test suite yet. See
-the project's commit history for what's landed since.
+per-directory rollups work end to end. The ignore-file parser has a unit
+test suite (`npm test`); the rest of the library doesn't yet. See the
+project's commit history for what's landed since.
